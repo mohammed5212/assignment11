@@ -1,41 +1,80 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate, NavLink } from 'react-router-dom';
+import { useState } from 'react';
+import {
+  Navbar,
+  Nav,
+  Container,
+  Form,
+  Button,
+  Alert,
+} from 'react-bootstrap';
 
-const Navbar = () => {
+const NavigationBar = () => {
+  const navigate = useNavigate();
+  const [userId, setUserId] = useState('');
+  const [error, setError] = useState('');
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+
+    const idNum = parseInt(userId.trim());
+
+    if (!userId || isNaN(idNum) || idNum < 1 || idNum > 10) {
+      setError('Please enter a valid user ID between 1 and 10');
+      return;
+    }
+
+    setError('');
+    navigate(`/user/${idNum}`);
+    setUserId('');
+  };
+
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
-      <div className="container"> {/* ✅ Wrap with Bootstrap container */}
-        <Link className="navbar-brand" to="/">My App</Link>
+    <>
+      <Navbar expand="lg" style={{ backgroundColor: '#1a1a40' }} variant="dark">
+        <Container>
+          <Navbar.Brand href="/" className="text-warning">My App</Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav">
+            <Nav className="me-auto">
+              <NavLink to="/" className="nav-link text-light">Home</NavLink>
+              <NavLink to="/about" className="nav-link text-light">About</NavLink>
+              <NavLink to="/contact" className="nav-link text-light">Contact</NavLink>
+            </Nav>
 
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
+            <Form className="d-flex" onSubmit={handleSearch}>
+              <Form.Control
+                type="text"
+                placeholder="User ID (1–10)"
+                className="me-2"
+                value={userId}
+                onChange={(e) => setUserId(e.target.value)}
+                style={{
+                  backgroundColor: '#f0f0f0',
+                  border: '1px solid #ccc',
+                  width: '130px',
+                }}
+              />
+              <Button variant="warning" type="submit">
+                Go
+              </Button>
+            </Form>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
+
+      {error && (
+        <Alert
+          variant="danger"
+          className="text-center rounded-0 mb-0"
+          onClose={() => setError('')}
+          dismissible
         >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-
-        <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav ms-auto">
-            <li className="nav-item">
-              <Link className="nav-link" to="/">Home</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/about">About</Link>
-            </li>
-            
-            <li className="nav-item">
-              <Link className="nav-link" to="/user">User</Link>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
+          {error}
+        </Alert>
+      )}
+    </>
   );
 };
 
-export default Navbar;
+export default NavigationBar;
